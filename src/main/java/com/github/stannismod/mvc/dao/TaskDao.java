@@ -8,7 +8,11 @@ public interface TaskDao {
 
     void addTask(Task task);
 
-    void removeTask(Task task);
+    void removeTask(String name);
+
+    Task getTaskByName(String name);
+
+    void setTaskStatus(String name, Task.Status status);
 
     List<Task> getTasks();
 
@@ -16,5 +20,5 @@ public interface TaskDao {
 
     List<Task> getOverdueTasks();
 
-    List<Task> getFinishedTasks();
+    List<Task> getCompletedTasks();
 }

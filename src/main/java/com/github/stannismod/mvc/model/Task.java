@@ -1,29 +1,56 @@
 package com.github.stannismod.mvc.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.text.DateFormat;
+import java.util.Date;
+
 public class Task {
 
-    private final String name;
-    private final String description;
-    private final long due;
-    private Status status;
+    private static final DateFormat DATE_TIME_FORMAT = DateFormat.getDateTimeInstance();
+
+    private String name;
+    private String description;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    private Date due;
+    private Status status = Status.ASSIGNED;
 
     public Task() {
-        this("empty", "no description", 0);
+        this("", "", new Date());
     }
 
-    public Task(final String name, final String description, final long due) {
+    public Task(final String name, final String description, final Date due) {
         this.name = name;
         this.description = description;
         this.due = due;
-        this.status = due < System.currentTimeMillis() ? Status.ASSIGNED : Status.FINISHED;
     }
 
     public String getName() {
         return name;
     }
 
-    public long getDue() {
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public Date getDue() {
         return due;
+    }
+
+    public void setDue(final Date due) {
+        this.due = due;
+    }
+
+    public String getDueString() {
+        return DATE_TIME_FORMAT.format(due);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public Status getStatus() {
@@ -36,6 +63,6 @@ public class Task {
 
     public enum Status {
         ASSIGNED,
-        FINISHED
+        COMPLETED
     }
 }
