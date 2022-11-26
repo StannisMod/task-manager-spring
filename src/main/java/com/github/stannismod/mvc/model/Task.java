@@ -2,24 +2,25 @@ package com.github.stannismod.mvc.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Task {
 
-    private static final DateFormat DATE_TIME_FORMAT = DateFormat.getDateTimeInstance();
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    private String list;
     private String name;
     private String description;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
-    private Date due;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime due;
     private Status status = Status.ASSIGNED;
 
     public Task() {
-        this("", "", new Date());
+        this("", "", LocalDateTime.now());
     }
 
-    public Task(final String name, final String description, final Date due) {
+    public Task(final String name, final String description, final LocalDateTime due) {
         this.name = name;
         this.description = description;
         this.due = due;
@@ -33,16 +34,16 @@ public class Task {
         this.name = name;
     }
 
-    public Date getDue() {
+    public LocalDateTime getDue() {
         return due;
     }
 
-    public void setDue(final Date due) {
+    public void setDue(final LocalDateTime due) {
         this.due = due;
     }
 
     public String getDueString() {
-        return DATE_TIME_FORMAT.format(due);
+        return due.format(DATE_TIME_FORMAT);
     }
 
     public String getDescription() {
@@ -59,6 +60,14 @@ public class Task {
 
     public void setStatus(final Status status) {
         this.status = status;
+    }
+
+    public String getList() {
+        return list;
+    }
+
+    public void setList(final String list) {
+        this.list = list;
     }
 
     public enum Status {

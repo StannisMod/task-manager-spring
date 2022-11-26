@@ -1,6 +1,6 @@
 package com.github.stannismod.mvc.controller;
 
-import com.github.stannismod.mvc.dao.TaskDao;
+import com.github.stannismod.mvc.dao.TaskListDao;
 import com.github.stannismod.mvc.logic.DataFilter;
 import com.github.stannismod.mvc.model.Filter;
 import com.github.stannismod.mvc.model.Task;
@@ -18,64 +18,62 @@ import java.util.Optional;
 @Controller
 public class TaskController {
 
-    private final TaskDao tasks;
+    private final TaskListDao tasks;
 
-    public TaskController(final TaskDao tasks) {
+    public TaskController(final TaskListDao tasks) {
         this.tasks = tasks;
     }
 
     @RequestMapping(value = "/add-task", method = RequestMethod.POST)
-    public String addTask(@ModelAttribute("task") Task task) {
+    public String addTask(@ModelAttribute("task") Task task, @RequestParam String list) {
+        task.setList(list);
         tasks.addTask(task);
-        return "redirect:/tasks";
+        return "redirect:/tasks?list=" + task.getList();
     }
 
     @RequestMapping(value = "/tasks", method = RequestMethod.GET)
-    public String getTasks(ModelMap map) {
-        prepareModelMap(map, tasks.getTasks());
+    public String getTasks(@RequestParam(required = false, defaultValue = "") String list, ModelMap map) {
+        prepareModelMap(map, list, tasks.getTaskLists(), tasks.getTasks(list));
         return "index";
     }
 
     @RequestMapping(value = "/filter-tasks", method = RequestMethod.GET)
-    public String getTasks(@RequestParam String filter, ModelMap map) {
+    public String getTasks(@RequestParam String list, @RequestParam String filter, ModelMap map) {
         Optional<DataFilter> dataFilter = DataFilter.getFilterByName(filter);
-        dataFilter.ifPresent(f -> prepareModelMap(map, f.filter(tasks)));
+        dataFilter.ifPresent(f -> prepareModelMap(map, list, tasks.getTaskLists(), f.filter(list, tasks)));
         return "index";
     }
 
     @RequestMapping(value = "/complete-task", method = RequestMethod.POST)
-    public String completeTask(@ModelAttribute("name") String name) {
-        tasks.setTaskStatus(name, Task.Status.COMPLETED);
-        return "redirect:/tasks";
+    public String completeTask(@RequestParam String list, @RequestParam String name) {
+        tasks.setTaskStatus(list, name, Task.Status.COMPLETED);
+        return "redirect:/tasks?list=" + list;
     }
 
     @RequestMapping(value = "/remove-task", method = RequestMethod.POST)
-    public String removeTask(@ModelAttribute("name") String name) {
-        tasks.removeTask(name);
+    public String removeTask(@RequestParam String list, @RequestParam String name) {
+        tasks.removeTask(list, name);
+        return "redirect:/tasks?list=" + list;
+    }
+
+    @RequestMapping(value = "/add-task-list", method = RequestMethod.POST)
+    public String addList(@RequestParam String name) {
+        tasks.addList(name);
+        return "redirect:/tasks?list=" + name;
+    }
+
+    @RequestMapping(value = "/remove-task-list", method = RequestMethod.POST)
+    public String removeList(@RequestParam String name) {
+        tasks.removeList(name);
         return "redirect:/tasks";
     }
 
-    private void prepareModelMap(ModelMap map, List<Task> tasks) {
-        map.addAttribute("wrapper", new TasksWrapper(tasks));
+    private void prepareModelMap(ModelMap map, String list, Iterable<String> lists, List<Task> tasks) {
+        map.addAttribute("tasks", tasks);
+        map.addAttribute("list", list);
+        map.addAttribute("lists", lists);
         map.addAttribute("task", new Task());
         map.addAttribute("filter", new Filter());
         map.addAttribute("now", new Date());
-    }
-
-    public static class TasksWrapper {
-
-        private List<Task> tasks;
-
-        public TasksWrapper(final List<Task> tasks) {
-            this.tasks = tasks;
-        }
-
-        public List<Task> getTasks() {
-            return tasks;
-        }
-
-        public void setTasks(final List<Task> tasks) {
-            this.tasks = tasks;
-        }
     }
 }

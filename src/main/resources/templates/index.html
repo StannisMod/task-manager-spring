@@ -8,7 +8,7 @@
             padding-right: 15px;
         }
         .data {
-            padding: 5px;
+            padding: 5px 5px 0px;
             vertical-align: center;
         }
     </style>
@@ -18,36 +18,6 @@
 <table>
 <tr>
     <td>
-        <table>
-            <tr>
-                <td>Status</td>
-                <td>Name</td>
-                <td>Due</td>
-                <td>Description</td>
-            </tr>
-            <th:block th:each="task, stat : ${wrapper.tasks}">
-                <tr th:style="${task.status.ordinal()} == 0 ? 'background-color: green;' : 'background-color: gray;'">
-                    <td class="data" th:text="${task.getStatus()}"/>
-                    <td class="data" th:text="${task.getName()}"/>
-                    <td class="data" th:text="${task.getDueString()}"/>
-                    <td class="data" th:text="${task.getDescription()}"/>
-                    <td class="data" th:style="${task.status.ordinal()} == 0 ? 'visible: true;' : 'visible: false;'">
-                        <form action="/complete-task" method="POST">
-                            <input style="width: 0; height: 0" type="hidden" name="name" th:value="${task.getName()}"/>
-                            <button style="height: 100%" type="submit" value="submit">Complete</button>
-                        </form>
-                    </td>
-                    <td class="data">
-                        <form action="/remove-task" method="POST">
-                            <input style="width: 0; height: 0" type="hidden" name="name" th:value="${task.getName()}"/>
-                            <button style="height: 100%" type="submit" value="submit">Remove</button>
-                        </form>
-                    </td>
-                </tr>
-            </th:block>
-        </table>
-    </td>
-    <td>
         <h3>Your tasks</h3>
         <form method="GET" action="/filter-tasks">
             <select th:name="filter">
@@ -56,6 +26,7 @@
                 <option value="overdue">overdue</option>
                 <option value="completed">completed</option>
             </select>
+            <input style="width: 0; height: 0" type="hidden" name="list" th:value="${list}"/>
             <input type="submit" value="filter">
         </form>
 
@@ -75,9 +46,80 @@
                     <td><input type="datetime-local" th:min="now" th:field="*{due}"/></td>
                 </tr>
             </table>
+            <input style="width: 0; height: 0" type="hidden" name="list" th:value="${list}"/>
 
             <input type="submit" value="add">
         </form>
+
+        <h3>Add task list</h3>
+        <form method="POST" action="/add-task-list">
+            <table>
+                <tr>
+                    <td><label>Name:</label></td>
+                    <td><input type="text" name="name"/></td>
+                </tr>
+            </table>
+
+            <input type="submit" value="add">
+        </form>
+
+        <table>
+            <h4>Task lists</h4>
+            <tr>
+                <td>Name</td>
+                <td>Actions</td>
+            </tr>
+            <th:block th:each="listIt : ${lists}">
+                <tr>
+                    <td class="data" th:text="${listIt}"/>
+                    <td class="data">
+                        <form action="/tasks" method="GET">
+                            <input style="width: 0; height: 0" type="hidden" name="list" th:value="${listIt}"/>
+                            <button style="height: 100%" type="submit" value="submit">Select</button>
+                        </form>
+                    </td>
+                    <td class="data">
+                        <form action="/remove-task-list" method="POST">
+                            <input style="width: 0; height: 0" type="hidden" name="name" th:value="${listIt}"/>
+                            <button style="height: 100%" type="submit" value="submit">Remove</button>
+                        </form>
+                    </td>
+                    <td class="data" th:if="${list == listIt}"><</td>
+                </tr>
+            </th:block>
+        </table>
+    </td>
+    <td>
+        <table>
+            <tr>
+                <td>Status</td>
+                <td>Name</td>
+                <td>Due</td>
+                <td>Description</td>
+            </tr>
+            <th:block th:each="task : ${tasks}">
+                <tr th:style="${task.status.ordinal()} == 0 ? 'background-color: green; border: 1px solid green;' : 'background-color: gray; border: 1px solid gray;'">
+                    <td class="data" th:text="${task.getStatus()}"/>
+                    <td class="data" th:text="${task.getName()}"/>
+                    <td class="data" th:text="${task.getDueString()}"/>
+                    <td class="data" th:text="${task.getDescription()}"/>
+                    <td class="data" th:style="${task.status.ordinal()} == 0 ? 'visible: true;' : 'visible: false;'">
+                        <form action="/complete-task" method="POST">
+                            <input style="width: 0; height: 0" type="hidden" name="name" th:value="${task.getName()}"/>
+                            <input style="width: 0; height: 0" type="hidden" name="list" th:value="${task.getList()}"/>
+                            <button style="height: 100%" type="submit" value="submit">Complete</button>
+                        </form>
+                    </td>
+                    <td class="data">
+                        <form action="/remove-task" method="POST">
+                            <input style="width: 0; height: 0" type="hidden" name="name" th:value="${task.getName()}"/>
+                            <input style="width: 0; height: 0" type="hidden" name="list" th:value="${task.getList()}"/>
+                            <button style="height: 100%" type="submit" value="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            </th:block>
+        </table>
     </td>
 </tr>
 </table>

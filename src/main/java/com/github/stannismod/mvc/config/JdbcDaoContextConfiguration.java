@@ -1,6 +1,6 @@
 package com.github.stannismod.mvc.config;
 
-import com.github.stannismod.mvc.dao.JdbcTaskDao;
+import com.github.stannismod.mvc.dao.JdbcTaskListDao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -13,8 +13,8 @@ import javax.sql.DataSource;
 @Configuration
 public class JdbcDaoContextConfiguration {
     @Bean
-    public JdbcTaskDao productJdbcDao(DataSource dataSource) {
-        return new JdbcTaskDao(dataSource);
+    public JdbcTaskListDao productJdbcDao(DataSource dataSource) {
+        return new JdbcTaskListDao(dataSource);
     }
 
     @Bean
