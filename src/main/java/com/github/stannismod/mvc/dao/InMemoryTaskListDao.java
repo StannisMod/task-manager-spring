@@ -67,7 +67,7 @@ public class InMemoryTaskListDao implements TaskListDao {
 
     @Override
     public List<Task> getActualTasks(final String list) {
-        long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis() / 1000;
         return getTaskList(list).tasks().stream()
                 .filter(t -> t.getStatus() == Task.Status.ASSIGNED)
                 .filter(t -> t.getDue().toEpochSecond(ZoneOffset.UTC) > now)
@@ -77,7 +77,7 @@ public class InMemoryTaskListDao implements TaskListDao {
 
     @Override
     public List<Task> getOverdueTasks(final String list) {
-        long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis() / 1000;
         return getTaskList(list).tasks().stream()
                 .filter(t -> t.getStatus() == Task.Status.ASSIGNED)
                 .filter(t -> t.getDue().toEpochSecond(ZoneOffset.UTC) <= now)

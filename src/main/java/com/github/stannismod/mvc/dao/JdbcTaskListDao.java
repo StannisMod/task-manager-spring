@@ -84,14 +84,14 @@ public class JdbcTaskListDao extends JdbcDaoSupport implements TaskListDao {
 
     @Override
     public List<Task> getActualTasks(final String list) {
-        String sql = "SELECT * FROM Tasks WHERE due > date('now') AND status="
+        String sql = "SELECT * FROM Tasks WHERE due > unixepoch() AND status="
                 + Task.Status.ASSIGNED.ordinal() + " AND list='" + list + "'";
         return getProductsByRequest(sql);
     }
 
     @Override
     public List<Task> getOverdueTasks(final String list) {
-        String sql = "SELECT * FROM Tasks WHERE due <= date('now') AND status="
+        String sql = "SELECT * FROM Tasks WHERE due <= unixepoch() AND status="
                 + Task.Status.ASSIGNED.ordinal() + " AND list='" + list + "'";
         return getProductsByRequest(sql);
     }
